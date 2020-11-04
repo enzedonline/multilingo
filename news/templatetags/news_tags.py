@@ -5,8 +5,8 @@ from django import urls
 from django.conf import settings
 
 register = template.Library()
-languages = ['es', 'ca', 'en', 'fr']
-print(settings.LANGUAGES)
+languages = [lang[0] for lang in settings.LANGUAGES]
+
 @register.simple_tag 
 def get_base_url(url):
     base = url.split("/")
@@ -28,7 +28,7 @@ def set_international_english():
 
 @register.simple_tag(takes_context=True)
 def translate_url(context: Dict[str, Any], language: Optional[str]) -> str:
-    # url = context['request'].build_absolute_uri('/') + \
-    #       language + \
-    #       get_base_url(context['request'].get_full_path())
-    return '' #url
+    url = context['request'].build_absolute_uri('/') + \
+          language + \
+          get_base_url(context['request'].get_full_path())
+    return url
