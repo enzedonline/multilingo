@@ -1,0 +1,132 @@
+{% load i18n %}
+{% load news_tags %}
+{% load static %}
+{% get_current_language as CURRENT_LANGUAGE_CODE %}
+{% if CURRENT_LANGUAGE_CODE == 'en' %}{% set_international_english %}{% endif %}
+{% get_available_languages as LANGUAGES %}
+{% get_language_info_list for LANGUAGES as languages %}
+{% get_base_url request.get_full_path as base_url %}
+<!doctype html>
+<html lang="{{CURRENT_LANGUAGE_CODE}}">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/slate/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/06cba37dd9.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+  <body>
+ 
+    <link rel="alternate" hreflang="x-default" href="{% translate_url LANGUAGE_CODE %}" />
+
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                Multi Language Demo
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse flex-grow-0  float-right" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="{% static CURRENT_LANGUAGE_CODE|add:'.png' %}" class="d-inline-block align-middle pb-1" alt="" loading="lazy">
+                            &nbsp;{{ CURRENT_LANGUAGE_CODE|language_name_local|capfirst }}
+                        </a>
+                        <div class="dropdown-menu" role="menu" id="language-list" aria-labelledby="navbarDropdownMenuLink">
+                            {% for language in languages %}
+                                {% if language.code != CURRENT_LANGUAGE_CODE %} 
+                                    {% translate_url language.code as lang_url %}
+                                    <link rel="alternate" hreflang="{{ language.code }}" href="{{lang_url}}" />
+                                    <a class="dropdown-item" href="{% url 'set_language' %}" data-language-code="{{ language.code }}" data-next="{{ base_url }}">
+                                        <img src="{% static language.code|add:'.png' %}" class="d-inline-block align-middle pb-1" alt="" loading="lazy">
+                                        &nbsp;{{ language.name_local|capfirst }}
+                                    </a> 
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </li>
+                </ul>
+
+<script>
+    $('#language-list a').on('click', function(event) {
+    event.preventDefault();
+    var target = $(event.target);
+    var url = target.attr('href');
+    var language_code = target.data('language-code');
+    var nextpage = target.data('next');
+    alert(nextpage);
+    $.ajax({
+        type: 'POST',
+        url: url,
+        data: {language: language_code},
+        headers: {"X-CSRFToken": getCookie('csrftoken')}
+    }).done(function(data, textStatus, jqXHR) {
+        setCookie("django_language",language_code, (10000 * 365 * 24 * 60 * 60));
+        window.location.href = nextpage;
+    });
+});
+function setCookie(cname, cvalue, exp) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exp));
+  var expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(name) {
+    var value = '; ' + document.cookie,
+        parts = value.split('; ' + name + '=');
+    if (parts.length == 2) return parts.pop().split(';').shift();
+}
+
+function reload_page() {
+    window.location.reload(true);
+}
+</script>
+
+                <form action="{% url 'set_language' %}" method="post">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ redirect_to }}" />
+                
+                    <select  class="custom-select bg-dark text-white border-0 w-auto" name="language" onchange="this.form.submit()">
+                        {% for language in languages %}
+                
+                            {% static language.code|add:'.png'  as flag %}    
+                      <option
+                            value="{{ language.code }}"
+                            {% if language.code == CURRENT_LANGUAGE_CODE %} selected="selected"{% endif %}
+
+                            data-content='<img src="{{flag}}"></span>
+                            <span style="display:inline-block; width:100px; padding-left: 10px; text-shadow:none">
+                              {{ language.name_local }}
+                              <!-- span style="color:#999;">&nbsp;[{{ language.code }}]</span -->
+                            </span>'>
+                            <img src="{{flag}}">  {{ language.name_local|capfirst }}
+                          </option>
+                
+                      {% endfor %}
+                    </select>
+                </form>                
+            </div>
+        </nav>
+    </header>
+
+
+
+    <div class="card">
+        <h5 class="card-header">{{ News_Item.title }}</h5>
+        <div class="card-body">
+            <p class="card-text">{{ News_Item.text }}</p>
+            <p><small class="text-muted">{{ News_Item.pub_date|date:"DATE_FORMAT" }}</small></p>
+            <a href="{% url 'home' %}" class="btn btn-primary">List</a>
+        </div>
+    </div>
+
+</body>
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
