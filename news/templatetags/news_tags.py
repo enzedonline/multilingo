@@ -21,11 +21,6 @@ def get_base_url(url):
 def get_verbose_name(object): 
     return object._meta.verbose_name
 
-@register.simple_tag
-def set_international_english():
-    translation.activate('en-GB')
-    return('')
-
 @register.simple_tag(takes_context=True)
 def translate_url(context: Dict[str, Any], language: Optional[str]) -> str:
     url = context['request'].build_absolute_uri('/') + \

@@ -6,15 +6,26 @@ $(document).ready(function() {
             var url = target.attr('href');
             var language_code = target.data('language-code');
             var nextpage = target.data('next');
+            try {
             $.ajax({
                 type: 'POST',
                 url: url,
                 data: {language: language_code},
                 headers: {"X-CSRFToken": getCookie('csrftoken')}
             }).done(function(data, textStatus, jqXHR) {
+                try {
                 setCookie("django_language",language_code, (10000 * 365 * 24 * 60 * 60));
+                alert("success");
+                }
+                catch(e) {alert("failed cookie");}
                 window.location.href = nextpage;
             });
+            }
+            catch(e) {}
+            finally {
+                // alert("failed everything")
+                // window.location.href = '/' + language_code + nextpage;
+            }
         });
         
         function setCookie(cname, cvalue, exp) {

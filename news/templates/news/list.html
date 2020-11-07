@@ -2,7 +2,6 @@
 {% load news_tags %}
 {% load static %}
 {% get_current_language as CURRENT_LANGUAGE_CODE %}
-{% if CURRENT_LANGUAGE_CODE == 'en' %}{% set_international_english %}{% endif %}
 {% get_available_languages as LANGUAGES %}
 {% get_language_info_list for LANGUAGES as languages %}
 {% get_base_url request.get_full_path as base_url %}
