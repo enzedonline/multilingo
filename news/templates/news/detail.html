@@ -4,7 +4,8 @@
 {% get_current_language as CURRENT_LANGUAGE_CODE %}
 {% get_available_languages as LANGUAGES %}
 {% get_language_info_list for LANGUAGES as languages %}
-{% get_base_url request.get_full_path as base_url %}
+{% get_base_url request as base_url %}
+
 <!doctype html>
 <html lang="{{CURRENT_LANGUAGE_CODE}}">
     <head>
@@ -15,13 +16,13 @@
 
     <body>
  
-    <link rel="alternate" hreflang="x-default" href="{% translate_url LANGUAGE_CODE %}" />
+        <link rel="alternate" hreflang="x-default" href="{{base_url}}{% get_language_url News_Item LANGUAGE_CODE %}" />
 
-    <header class="sticky-top">
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                Multi Language Demo
-            </a>
+        <header class="sticky-top">
+            <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    {% trans "Multi Language Demo" %}
+                </a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -32,13 +33,13 @@
                             <img src="{% static CURRENT_LANGUAGE_CODE|add:'.png' %}" class="d-inline-block align-middle pb-1" alt="" loading="lazy">
                             &nbsp;{{ CURRENT_LANGUAGE_CODE|language_name_local|capfirst }}
                         </a>
-                        <div class="dropdown-menu" role="menu" id="language-list" aria-labelledby="navbarDropdownMenuLink">
+                        <div class="dropdown-menu" role="menu" id="languagelist" aria-labelledby="navbarDropdownMenuLink">
                             {% csrf_token %}
                             {% for language in languages %}
                                 {% if language.code != CURRENT_LANGUAGE_CODE %} 
-                                    {% translate_url language.code as lang_url %}
-                                    <link rel="alternate" hreflang="{{ language.code }}" href="{{lang_url}}" />
-                                    <a class="dropdown-item" href="{% url 'set_language' %}" data-language-code="{{ language.code }}" data-next="{{ base_url }}">
+                                    {% get_language_url News_Item language.code as language_url %}
+                                    <link rel="alternate" hreflang="{{ language.code }}" href="{{ base_url }}{{language_url}}" />
+                                    <a class="dropdown-item" href="{% url 'set_language' %}" data-nextpage="/{{ language_url }}" data-languagecode="{{ language.code }}">
                                         <img src="{% static language.code|add:'.png' %}" class="d-inline-block align-middle pb-1" alt="" loading="lazy">
                                         &nbsp;{{ language.name_local|capfirst }}
                                     </a> 
@@ -50,13 +51,16 @@
             </div>
         </nav>
     </header>
+
     <main>
         <div class="card">
+            {% get_verbose_field_name News_Item 'title' %}
             <h5 class="card-header">{{ News_Item.title }}</h5>
             <div class="card-body">
+                {% get_verbose_field_name News_Item 'text' %}
                 <p class="card-text">{{ News_Item.text }}</p>
-                <p><small class="text-muted">{{ News_Item.pub_date|date:"d F Y"|title }}</small></p>
-                <a href="{% url 'home' %}" class="btn btn-primary">List</a>
+                <p><small class="text-muted">{% get_verbose_field_name News_Item 'pub_date' %}: {{ News_Item.pub_date|date:"d F Y"|title }}</small></p>
+                <a href="{% url 'home' %}" class="btn btn-primary">{% trans "List" %}</a>
             </div>
         </div>  
     </main>

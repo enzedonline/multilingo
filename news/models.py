@@ -6,7 +6,6 @@ from django.utils.text import slugify
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.conf import settings
-from django.db.models import Q
 
 import string, random
 
@@ -36,7 +35,8 @@ class News(models.Model):
     pub_date = models.DateTimeField(verbose_name=_('Publication Date'), default=timezone.now)
     
     def get_absolute_url(self):
-       return (reverse('news-detail', args=[self.slug]))
+        lang = get_language()
+        return (reverse(f'news-detail-{lang}', args=[self.slug]))
 
 @receiver(pre_save, sender=News)
 def pre_save_receiver(sender, instance, *args, **kwargs): 
@@ -51,6 +51,6 @@ def pre_save_receiver(sender, instance, *args, **kwargs):
             title = getattr(instance, f"title_{lang}")
             result = unique_slug_generator(instance, slugfieldname, title) 
             setattr(instance, slugfieldname, result)
-            
-        
 
+
+       

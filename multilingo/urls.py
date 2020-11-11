@@ -10,5 +10,8 @@ urlpatterns = [
 urlpatterns += i18n_patterns(
     path('admin/', admin.site.urls),
     path('', views.NewsListView.as_view(),name='home'),
-    path('news/<slug>/', views.NewsDetail.as_view(), name='news-detail'),
+    path('news/<slug>/', views.NewsDetail.as_view(), name='news-detail-en'),
+    path('noticias/<slug>/', views.NewsDetail.as_view(), name='news-detail-es'),
+    path('noticies/<slug>/', views.NewsDetail.as_view(), name='news-detail-ca'),
+    path('nouvelles/<slug>/', views.NewsDetail.as_view(), name='news-detail-fr'),
 )

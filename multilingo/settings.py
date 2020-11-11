@@ -76,14 +76,15 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'es'
 
 LANGUAGES = (
-    ('es', _('Spanish')),
-    ('ca', _('Catalan')),
-    ('en', _('English')),
-    ('fr', _('French')),
+    ('es', 'Spanish'),
+    ('ca', 'Catalan'),
+    ('en', 'English'),
+    ('fr', 'French'),
 )
 LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale'),
 )
+NEWS_PATH = {'es': 'noticias', 'ca': 'noticies', 'en': 'news', 'fr': 'nouvelles'}
 
 TIME_ZONE = 'UTC'
 USE_I18N = True

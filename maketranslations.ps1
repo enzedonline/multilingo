@@ -1,0 +1,1 @@
+django-admin makemessages --exclude="static" --exclude=".env" --locale="es" --locale="ca" --locale="fr"

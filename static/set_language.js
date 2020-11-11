@@ -1,31 +1,28 @@
 $(document).ready(function() {
 
-        $('#language-list a').on('click', function(event) {
+        $('#languagelist a').on('click', function(event) {
             event.preventDefault();
-            var target = $(event.target);
-            var url = target.attr('href');
-            var language_code = target.data('language-code');
-            var nextpage = target.data('next');
+            let target = $(event.currentTarget);
+            let nextpage = target.data('nextpage');
+            let url = target.attr('href');
+            let language_code = target.data('languagecode');
             try {
-            $.ajax({
-                type: 'POST',
-                url: url,
-                data: {language: language_code},
-                headers: {"X-CSRFToken": getCookie('csrftoken')}
-            }).done(function(data, textStatus, jqXHR) {
-                try {
-                setCookie("django_language",language_code, (10000 * 365 * 24 * 60 * 60));
-                alert("success");
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {language: language_code, next: nextpage},
+                    headers: {"X-CSRFToken": getCookie('csrftoken')}
+                    }).done(function(data, textStatus, jqXHR) {
+                        try {
+                            setCookie("django_language", language_code, (10000 * 365 * 24 * 60 * 60));
+                            }
+                        catch(e) {
+                            }
+                        window.location.href = nextpage;
+                        });
                 }
-                catch(e) {alert("failed cookie");}
-                window.location.href = nextpage;
-            });
-            }
             catch(e) {}
-            finally {
-                // alert("failed everything")
-                // window.location.href = '/' + language_code + nextpage;
-            }
+            finally {}
         });
         
         function setCookie(cname, cvalue, exp) {
